@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatApp Test</title>
+</head>
+<body>
+  <h2>Chat Application</h2>
+
+  <ul id="messages"></ul>
+
+  <input type="text" id="messageInput" placeholder="Type a message...">
+  <button onclick="sendMessage()">Send</button>
+
+  <!-- SockJS + STOMP -->
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+  <script>
+    // Connecting to SockJS
+    const socket = new SockJS('http://localhost:8080/ws/chat');
+    const stompClient = Stomp.over(socket);
+
+    // Connect
+    stompClient.connect({}, function (frame) {
+      console.log('Connected: ' + frame);
+
+      // Subscribe to topic
+      stompClient.subscribe('/topic/messages', function (message) {
+        const msg = JSON.parse(message.body);
+        const messagesList = document.getElementById('messages');
+        const li = document.createElement('li');
+        li.textContent = msg.content;
+        messagesList.appendChild(li);
+      });
+    });
+
+    // Send Message
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const messageContent = input.value.trim();
+
+      if (messageContent !== '') {
+        stompClient.send("/app/chat", {}, JSON.stringify({ content: messageContent }));
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>

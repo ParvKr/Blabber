@@ -2,6 +2,9 @@ package com.example.chatapp.service;
 
 import com.example.chatapp.model.ChatMessage;
 import com.example.chatapp.repository.ChatMessageRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +23,9 @@ public class ChatService {
         chatMessageRepository.save(message);
     }
 
-    // Retrieve chat history from database
-    public List<ChatMessage> getChatHistory() {
-        return chatMessageRepository.findAll();
+    // Retrieve chat history with pagination
+    public List<ChatMessage> getChatHistory(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return chatMessageRepository.findAll(pageable).getContent();
     }
 }

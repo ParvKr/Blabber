@@ -11,13 +11,19 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void registerStompEndpoints(@SuppressWarnings("null") StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat").setAllowedOrigins("*").withSockJS();
-        registry.addEndpoint("/call").setAllowedOrigins("*");
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Allow frontend from localhost and 127.0.0.1 for development
+        registry.addEndpoint("/ws/chat")
+                .setAllowedOrigins("http://localhost:5500", "http://127.0.0.1:5500")
+                .withSockJS();
+
+        registry.addEndpoint("/ws/call")
+                .setAllowedOrigins("http://localhost:5500", "http://127.0.0.1:5500")
+                .withSockJS();
     }
 
     @Override
-    public void configureMessageBroker(@SuppressWarnings("null") MessageBrokerRegistry registry) {
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
     }
